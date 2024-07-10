@@ -1,7 +1,25 @@
-from django.contrib.auth.views import LogoutView
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 from . import views
+from .views import (
+    ApartmentViewSet,
+    BuildingViewSet,
+    EntranceViewSet,
+    LoginViewSet,
+    LogoutViewSet,
+    UserRegistrationViewSet,
+)
+
+router = DefaultRouter()
+router.register(r"buildings", BuildingViewSet)
+router.register(r"entrances", EntranceViewSet)
+router.register(r"apartments", ApartmentViewSet)
+
+router.register(r"user-register", UserRegistrationViewSet, basename="user-register")
+router.register(r"login", LoginViewSet, basename="login")
+router.register(r"logout", LogoutViewSet, basename="logout")
+
 
 urlpatterns = [
     path("admin-dashboard", views.dashboard_admin, name="dashboard-admin"),
@@ -27,4 +45,6 @@ urlpatterns = [
         "delete-apartment/<int:number>", views.delete_apartment, name="delete-apartment"
     ),
     path("event-log/", views.view_event_log, name="event-log"),
+    path("api/", include(router.urls)),
+    path("api/auth/login/", LoginViewSet.as_view({"post": "login"}), name="api-login"),
 ]

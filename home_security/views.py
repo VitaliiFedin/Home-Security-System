@@ -1,8 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
+from rest_framework import status, viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 from .decorators import admin_required
 from .forms import (
@@ -12,7 +15,14 @@ from .forms import (
     EntranceForm,
     LoginForm,
 )
-from .models import Apartment, Building, Entrance, Event, User
+from .models import Apartment, Building, Entrance, Event
+from .serializers import (
+    ApartmentSerializer,
+    BuildingSerializer,
+    EntranceSerializer,
+    LoginSerializer,
+    UserRegistrationSerializer,
+)
 
 
 def register(request):
@@ -442,3 +452,67 @@ def log_event(user, action, details=""):
 def view_event_log(request):
     logs = Event.objects.all().order_by("-timestamp")
     return render(request, "event-log.html", {"logs": logs})
+
+
+class BuildingViewSet(viewsets.ModelViewSet):
+    queryset = Building.objects.all()
+    serializer_class = BuildingSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class EntranceViewSet(viewsets.ModelViewSet):
+    queryset = Entrance.objects.all()
+    serializer_class = EntranceSerializer
+
+
+class ApartmentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Apartment.objects.all()
+    serializer_class = ApartmentSerializer
+
+
+class UserRegistrationViewSet(viewsets.GenericViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = UserRegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {"message": "Registration successful"}, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = LoginSerializer
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data.get("username")
+            password = serializer.validated_data.get("password")
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                log_event(request.user, "Log IN", f"User {request.user} log in")
+                return Response(
+                    {"message": "Login successful"}, status=status.HTTP_200_OK
+                )
+            return Response(
+                {"error": "Invalid username or password"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        user_to_logout = request.user
+        logout(request)
+        log_event(user_to_logout, "Log OUT", f"User {user_to_logout} log out")
+        return Response({"message": "Logout successfully"}, status=status.HTTP_200_OK)

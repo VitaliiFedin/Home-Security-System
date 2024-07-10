@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "home_security",
+    "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -134,5 +136,5 @@ MESSAGE_TAGS = {
     messages.INFO: "info",
     messages.SUCCESS: "success",
     messages.WARNING: "warning",
-    messages.ERROR: "danger"
+    messages.ERROR: "danger",
 }
