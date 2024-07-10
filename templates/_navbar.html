@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'home' %}">Home</a>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+
+            {% if user.is_admin %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard-admin' %}">Admin Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'add-building' %}">Add Building</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'add-entrance' %}">Add Entrance</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'add-apartment' %}">Add Apartment</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'event-log' %}">Logs</a>
+            </li>
+            {% endif %} 
+            {% if user.is_manager %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard-admin' %}">Manager Dashboard</a>
+            </li>
+            {% endif %} 
+            {% if user.is_guard %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard-admin' %}">Guard Dashboard</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>

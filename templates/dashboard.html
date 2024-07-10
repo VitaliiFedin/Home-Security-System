@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock title %}
+{% block content %}
+{% include '_navbar.html' %}
+{% include 'messages.html' %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Building Number</th>
+            <th>Manager</th>
+            <th>Entrances</th>
+            <th>Guard</th>
+            <th>Apartments</th>
+            {% if not is_guard %}
+            <th>Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% if is_guard %}
+            {% for entrance in guarded_entrances %}
+            <tr>
+                <td>{{ entrance.building.number }}</td>
+                <td>{% if entrance.building.manager %}{{ entrance.building.manager.username }}{% else %}None{% endif %}</td>
+                <td>{{ entrance.number }}</td>
+                <td>{{ request.user.username }}</td>
+                <td>
+                    {% if entrance.apartments.exists %}
+                        {% for apartment in entrance.apartments.all %}
+                            {{ apartment.number }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        No apartments
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Add any guard-specific actions here if needed -->
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            {% for building in buildings %}
+            <tr>
+                <td>{{ building.number }}</td>
+                <td>{% if building.manager %}{{ building.manager.username }}{% else %}None{% endif %}</td>
+                <td>
+                    <ul class="list-unstyled">
+                        {% for entrance in building.entrances.all %}
+                        <li>{{ entrance.number }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        {% for entrance in building.entrances.all %}
+                        <li>{% if entrance.guard %}{{ entrance.guard.username }}{% else %}None{% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        {% for entrance in building.entrances.all %}
+                        <li>
+                            {% if entrance.apartments.exists %}
+                                {% for apartment in entrance.apartments.all %}
+                                    {{ apartment.number }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                No apartments
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    {% if user.is_admin %}
+                    <a href="{% url 'edit-building' building.number %}" class="btn btn-primary mb-1">Edit building</a>
+                    <a href="{% url 'edit-entrance' building.number %}" class="btn btn-primary mb-1">Edit entrances</a>
+                    <a href="{% url 'edit-apartment' building.number %}" class="btn btn-primary mb-1">Edit apartment</a>
+                    
+                    {% elif user.is_manager %}
+                    <a href="{% url 'edit-entrance' building.number %}" class="btn btn-primary mb-1">Edit entrances</a>
+                    
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+{% endblock content %}

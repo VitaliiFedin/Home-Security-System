@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block title %} Add building {% endblock title %} 
+{% block content %}
+{% include '_navbar.html' %}
+<h2>Add entrance</h2>
+{% include 'messages.html' %}
+<form method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="id_number">number</label>
+    {{ form.number }}
+  </div>
+  <div class="form-group">
+    <label for="id_guard">guard</label>
+    {{ form.guard }}
+  </div>
+  <div class="form-group">
+    <label for="id_building">building</label>
+    {{ form.building }}
+  </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+
+{% endblock content %}
