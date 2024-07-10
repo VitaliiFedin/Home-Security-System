@@ -10,7 +10,7 @@ git clone https://github.com/VitaliiFedin/Home-Security-System.git
 ### Start project
 To start application you need to create .env file inside root directory (where manage.py located) with variables (examples in .env.sample).Then by using docker run in terminal
 ```bash
-docker-compose run -d --build
+docker-compose up -d --build
 ```
 - -d detach mode, so you can still use terminal
 - --build build image
