@@ -46,5 +46,4 @@ urlpatterns = [
     ),
     path("event-log/", views.view_event_log, name="event-log"),
     path("api/", include(router.urls)),
-    path("api/auth/login/", LoginViewSet.as_view({"post": "login"}), name="api-login"),
 ]

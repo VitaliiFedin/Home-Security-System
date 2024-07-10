@@ -66,10 +66,3 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.action} - {self.timestamp}"
-
-
-class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)

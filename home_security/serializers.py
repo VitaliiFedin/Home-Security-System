@@ -24,6 +24,7 @@ class EntranceSerializer(serializers.ModelSerializer):
     building = serializers.SlugRelatedField(
         read_only=True, slug_field="number", many=False
     )
+
     class Meta:
         model = Entrance
         fields = "__all__"
@@ -33,6 +34,7 @@ class ApartmentSerializer(serializers.ModelSerializer):
     entrance = serializers.SlugRelatedField(
         read_only=True, slug_field="number", many=False
     )
+
     class Meta:
         model = Apartment
         fields = "__all__"

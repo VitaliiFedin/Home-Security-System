@@ -74,7 +74,7 @@ def dashboard_admin(request):
         buildings = Building.objects.filter(manager=request.user).prefetch_related(
             "entrances__apartments"
         )
-    else:  # Guard
+    else:
         guarded_entrances = (
             Entrance.objects.filter(guard=request.user)
             .select_related("building")
@@ -112,7 +112,6 @@ def add_building(request):
             number = form.cleaned_data.get("number")
             manager = form.cleaned_data.get("manager")
 
-            # Check if a building with the same number already exists
             if Building.objects.filter(number=number).exists():
                 messages.error(
                     request, f"Building with number {number} already exists."
@@ -126,9 +125,7 @@ def add_building(request):
                     request,
                     f"Successfully added building {number} with manager {manager}",
                 )
-                return redirect(
-                    "add-building"
-                )  # Redirect to a relevant page after successful addition
+                return redirect("add-building")
         else:
             messages.error(
                 request, "Error adding building. Make sure number is greater than 0."
@@ -143,7 +140,7 @@ def add_building(request):
 def delete_building(request, number):
     building = get_object_or_404(Building, number=number)
     if request.method == "POST":
-        # Delete the building
+
         building.delete()
         log_event(
             request.user, "Deleted Building", f"Building {building.number} deleted"
@@ -152,13 +149,10 @@ def delete_building(request, number):
             request,
             "Successfully deleted building ",
         )
-        # Redirect to a success page or another appropriate URL
-        return redirect(
-            "dashboard-admin"
-        )  # Example: Redirect to dashboard after deletion
 
-    # Handle other HTTP methods (GET, etc.) gracefully if needed
-    return redirect("dashboard-admin")  # Redirect to dashboard if not a POST request
+        return redirect("dashboard-admin")
+
+    return redirect("dashboard-admin")
 
 
 @login_required
@@ -243,7 +237,6 @@ def edit_entrance(request, building_number):
             Entrance, number=entrance_number, building=building
         )
 
-        # Create a new dictionary with the correct field names
         form_data = {
             "number": request.POST.get(f"{entrance_number}-number"),
             "guard": request.POST.get(f"{entrance_number}-guard"),
@@ -253,7 +246,7 @@ def edit_entrance(request, building_number):
         form = EntranceForm(form_data, instance=entrance)
         if form.is_valid():
             try:
-                # Check if an entrance with the same number already exists for this building
+
                 existing_entrance = (
                     Entrance.objects.filter(
                         number=form.cleaned_data["number"], building=building
@@ -306,20 +299,17 @@ def edit_entrance(request, building_number):
 def delete_entrance(request, number):
     entrance = get_object_or_404(Entrance, number=number)
     if request.method == "POST":
-        # Delete the building
+
         entrance.delete()
         log_event(
             request.user,
             "Deleted Entrance",
             f"Entrance {number} has been deleted",
         )
-        # Redirect to a success page or another appropriate URL
-        return redirect(
-            "dashboard-admin"
-        )  # Example: Redirect to dashboard after deletion
 
-    # Handle other HTTP methods (GET, etc.) gracefully if needed
-    return redirect("dashboard-admin")  # Redirect to dashboard if not a POST request
+        return redirect("dashboard-admin")
+
+    return redirect("dashboard-admin")
 
 
 @login_required
@@ -373,7 +363,7 @@ def edit_apartment(request, building_number):
         form = ApartmentForm(form_data, instance=apartment)
         if form.is_valid():
             try:
-                # Check for existing apartment with the same number in this entrance
+
                 existing_apartment = (
                     Apartment.objects.filter(
                         number=form.cleaned_data["number"],
@@ -427,20 +417,17 @@ def edit_apartment(request, building_number):
 def delete_apartment(request, number):
     apartment = get_object_or_404(Apartment, number=number)
     if request.method == "POST":
-        # Delete the building
+
         apartment.delete()
         log_event(
             request.user,
             "Deleted Apartment",
             f"Apartment {number} has been deleted",
         )
-        # Redirect to a success page or another appropriate URL
-        return redirect(
-            "dashboard-admin"
-        )  # Example: Redirect to dashboard after deletion
 
-    # Handle other HTTP methods (GET, etc.) gracefully if needed
-    return redirect("dashboard-admin")  # Redirect to dashboard if not a POST request
+        return redirect("dashboard-admin")
+
+    return redirect("dashboard-admin")
 
 
 def log_event(user, action, details=""):
